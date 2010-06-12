@@ -27,4 +27,12 @@
       <url>http://maven.glassfish.org/content/groups/public/</url>
     </pluginRepository>
   </pluginRepositories>
+  <url>http://wiki.hudson-ci.org/display/HUDSON/utplsql+Plugin</url>
+  <developers>
+    <developer>
+      <id>kusemuckl</id>
+      <name>Nils op den Winkel</name>
+      <email>nils@kusemuckl.de</email>
+    </developer>
+  </developer>
 </project>
