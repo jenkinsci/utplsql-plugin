@@ -3,14 +3,14 @@
   <parent>
     <groupId>org.jvnet.hudson.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>1.359</version><!-- which version of Hudson is this plugin built against? -->
+    <version>1.377</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <groupId>hudson.plugins.utplsql</groupId>
   <artifactId>utplsql</artifactId>
-  <name>Hudson utPLSQL plugin</name>
-  <version>0.4-SNAPSHOT</version>
+  <name>Jenkins utPLSQL plugin</name>
+  <version>0.4</version>
   <packaging>hpi</packaging>
 
   <!-- get every artifact through maven.glassfish.org, which proxies all the artifacts that we need -->
@@ -27,7 +27,7 @@
       <url>http://maven.glassfish.org/content/groups/public/</url>
     </pluginRepository>
   </pluginRepositories>
-  <url>http://wiki.hudson-ci.org/display/HUDSON/utplsql+Plugin</url>
+  <url>http://wiki.jenkins-ci.org/display/JENKINS/utplsql+Plugin</url>
   <developers>
     <developer>
       <id>kusemuckl</id>
@@ -35,4 +35,10 @@
       <email>nils@kusemuckl.de</email>
     </developer>
   </developers>
+
+  <scm>
+    <connection>scm:svn:https://svn.jenkins-ci.org/tags/utplsql-0.4</connection>
+    <developerConnection>scm:svn:https://svn.jenkins-ci.org/tags/utplsql-0.4</developerConnection>
+    <url>http://fisheye.jenkins-ci.org/browse/Hudson/tags/utplsql-0.4</url>
+  </scm>
 </project>
