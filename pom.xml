@@ -10,7 +10,7 @@
   <groupId>hudson.plugins.utplsql</groupId>
   <artifactId>utplsql</artifactId>
   <name>Jenkins utPLSQL plugin</name>
-  <version>0.4</version>
+  <version>0.5-SNAPSHOT</version>
   <packaging>hpi</packaging>
 
   <!-- get every artifact through maven.glassfish.org, which proxies all the artifacts that we need -->
@@ -35,10 +35,4 @@
       <email>nils@kusemuckl.de</email>
     </developer>
   </developers>
-
-  <scm>
-    <connection>scm:svn:https://svn.jenkins-ci.org/tags/utplsql-0.4</connection>
-    <developerConnection>scm:svn:https://svn.jenkins-ci.org/tags/utplsql-0.4</developerConnection>
-    <url>http://fisheye.jenkins-ci.org/browse/Hudson/tags/utplsql-0.4</url>
-  </scm>
 </project>
