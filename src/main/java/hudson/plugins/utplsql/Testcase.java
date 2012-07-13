@@ -39,6 +39,8 @@ public class Testcase implements Serializable
 	public static final String SUCCESS = "SUCCESS";
 	public static final String FAILURE = "FAILURE";
 	
+	private static long counter = 1;
+	
     private String result;
     
     private void setResult(String result) {
@@ -77,14 +79,64 @@ public class Testcase implements Serializable
      */
     public Testcase(String line)
     {
+    	// a normal line looks like
+    	//RESULT - UT_PACKAGE.UT_PROCEDURE: EQFUNCTION "assert message" Result
+    	//^^^^^^   ^^^^^^^^^^ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ ^^^^^^
+    	//||||||   |||||||||| ||||||||||||||||||||||||| |||||||||||||| ||||||
+    	//||||||   |||||||||| ||||||||||||||||||||||||| |||||||||||||| ++++++-> this.message
+    	//||||||   |||||||||| ||||||||||||||||||||||||| ||||||||||||||+-------> functionSeparator
+    	//||||||   |||||||||| +++++++++++++++++++++++++-++++++++++++++--------> this.name (" are not allowed)
+    	//||||||   ||||||||||+------------------------------------------------> packageSeparator
+    	//||||||   ++++++++++-------------------------------------------------> this.className
+    	//++++++--------------------------------------------------------------> this.result
+    	
+    	//but there are a lot of exceptions, which we try to handle as usefull as possible.
+    	
     	setResult(line.substring(0, 7));
     	int packageSeparator = line.indexOf(".", 9);
     	this.className = line.substring(10, packageSeparator);
     	int functionSeparator = line.indexOf(":", packageSeparator);
-    	this.name = line.substring(packageSeparator + 1, functionSeparator);
-    	this.message = line.substring(functionSeparator+2);
+    	//little hack, to get the assert message as part of the function
+    	functionSeparator = line.indexOf("\"", functionSeparator);
+    	if (functionSeparator < 0)
+    	{
+    		//utAssert.this does not have a message with "" at all so just take the rest of the line
+        	this.name = this.counter++ + line.substring(packageSeparator + 1);
+        	//this is only visible in case of failure anyway.
+        	this.message = "false";
+    	}
+    	else
+    	{
+    		functionSeparator = line.indexOf("\"", functionSeparator + 1);
+    		if (functionSeparator > 0)
+    		{
+    			//if the function is really long, the second " may not be in the same line. Then just take the whole line
+    			//we have to replace some characters, since SAX does not like them inside an xml thingy.
+    			this.name = this.counter++ + line.substring(packageSeparator + 1, functionSeparator).replace("\"", "").replace("<","");
+    		}	
+    		else
+    		{
+    			//we have to replace some characters, since SAX does not like them inside an xml thingy.
+    			this.name = this.counter++ + line.substring(packageSeparator + 1).replace("\"", "").replace("<","");
+    		}    		
+    		if (functionSeparator+2 < line.length())
+    		{
+    			this.message = line.substring(functionSeparator+2);
+    		}
+    		else
+    		{
+    			//Sometimes there may be no results behind the assert text. Then we simply don't add a message yet.
+    			//It will probably added with appendToMessage
+    			this.message = "";
+    		}
+    	}
     }
         
+    public void appendToMessage(String newLine)
+    {
+    	this.message = this.message + System.getProperty("line.separator") + newLine;
+    }
+    
     /**
      * Returns an xml-snippet to be inserted into the jUnit-file
      * @return some text, ready to be inserted into a jUnit-file

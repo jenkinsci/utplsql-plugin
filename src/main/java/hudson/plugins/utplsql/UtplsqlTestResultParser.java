@@ -98,6 +98,7 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 
 			for (File file : files) {
 				TestPackage currentPackage = null;
+				Testcase currentTestcase = null;
 				String currentLine;
 				BufferedReader fr = new BufferedReader(new FileReader(file));
 				do {
@@ -120,10 +121,20 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 						}
 						currentPackage = new TestPackage(currentLine.substring(
 								10, currentLine.length() - 1));
+						currentTestcase = null;
 					} else if (Pattern.matches("^((SUCCESS)|(FAILURE)) - .*",
 							currentLine)) {
 						// TODO: What about multiline stuff?
-						currentPackage.add(new Testcase(currentLine));
+						currentTestcase = new Testcase(currentLine);
+						currentPackage.add(currentTestcase);
+					} else if (Pattern.matches("^>.*", currentLine))
+					{
+						currentTestcase = null;
+					} else if (currentTestcase != null)
+					{
+						//First shot for multiline: If we have a current testcase and the line does not start with ">",
+						//we append the output to the current testcase. Let's see, if that works.
+						currentTestcase.appendToMessage(currentLine);
 					}
 
 				} while (true);

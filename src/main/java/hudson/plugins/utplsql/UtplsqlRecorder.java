@@ -102,6 +102,10 @@ public class UtplsqlRecorder extends Recorder implements Serializable{
 			BuildListener listener) throws InterruptedException, IOException {
     	//a rough copy from the jUnit Recorder and NUnit recorder, since we just want to use that one first,
     	//before developing our own.
+
+		//Not realy nice, to hardcode the path, but will be removed anyway, as soon
+		//as the jUnit-part is skipped
+    	build.getWorkspace().child("utPlsql-temporary").deleteRecursive();
     	
     	UtplsqlTestResultParser parser = new UtplsqlTestResultParser();
     	TestResult testResult = parser.parse(testResults, build, launcher, listener);
@@ -121,10 +125,6 @@ public class UtplsqlRecorder extends Recorder implements Serializable{
 
 		if (action.getResult().getFailCount() > 0)
 			build.setResult(Result.UNSTABLE);
-
-		//Not realy nice, to hardcode the path, but will be removed anyway, as soon
-		//as the jUnit-part is skipped
-		build.getWorkspace().child("utPlsql-temporary").deleteRecursive();
 
     	return true;
     }
