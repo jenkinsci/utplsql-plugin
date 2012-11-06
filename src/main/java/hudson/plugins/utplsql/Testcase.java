@@ -39,8 +39,6 @@ public class Testcase implements Serializable
 	public static final String SUCCESS = "SUCCESS";
 	public static final String FAILURE = "FAILURE";
 	
-	private static long counter = 1;
-	
     private String result;
     
     private void setResult(String result) {
@@ -77,7 +75,7 @@ public class Testcase implements Serializable
      * Constructor to instanciate a testcase by parsing a given line of utPLSQL output
      * @param line one line of dbms_output indicating success or failure of a single assert
      */
-    public Testcase(String line)
+    public Testcase(TestPackage testPackage, String line)
     {
     	// a normal line looks like
     	//RESULT - UT_PACKAGE.UT_PROCEDURE: EQFUNCTION "assert message" Result
@@ -101,7 +99,7 @@ public class Testcase implements Serializable
     	if (functionSeparator < 0)
     	{
     		//utAssert.this does not have a message with "" at all so just take the rest of the line
-        	this.name = this.counter++ + line.substring(packageSeparator + 1);
+        	this.name = testPackage.getCounter() + line.substring(packageSeparator + 1);
         	//this is only visible in case of failure anyway.
         	this.message = "false";
     	}
@@ -112,12 +110,12 @@ public class Testcase implements Serializable
     		{
     			//if the function is really long, the second " may not be in the same line. Then just take the whole line
     			//we have to replace some characters, since SAX does not like them inside an xml thingy.
-    			this.name = this.counter++ + line.substring(packageSeparator + 1, functionSeparator).replace("\"", "").replace("<","");
+    			this.name = testPackage.getCounter() + line.substring(packageSeparator + 1, functionSeparator).replace("\"", "").replace("<","");
     		}	
     		else
     		{
     			//we have to replace some characters, since SAX does not like them inside an xml thingy.
-    			this.name = this.counter++ + line.substring(packageSeparator + 1).replace("\"", "").replace("<","");
+    			this.name = testPackage.getCounter() + line.substring(packageSeparator + 1).replace("\"", "").replace("<","");
     		}    		
     		if (functionSeparator+2 < line.length())
     		{

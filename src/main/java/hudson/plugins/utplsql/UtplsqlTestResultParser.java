@@ -125,7 +125,7 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 					} else if (Pattern.matches("^((SUCCESS)|(FAILURE)) - .*",
 							currentLine)) {
 						// TODO: What about multiline stuff?
-						currentTestcase = new Testcase(currentLine);
+						currentTestcase = new Testcase(currentPackage, currentLine);
 						currentPackage.add(currentTestcase);
 					} else if (Pattern.matches("^>.*", currentLine))
 					{

@@ -52,11 +52,20 @@ public class TestPackage implements Serializable {
 	 */
 	private String name;
 	
+	/**
+	 * workaround for jUnit behaviour.
+	 */
+	private long counter;
+	
 	
 	public String getName() {
 		return name;
 	}
 
+	public long getCounter() {
+		return counter++;
+	}
+	
 	/**
 	 * Creates a new instance of this class
 	 * @param name the name of the test package
@@ -66,6 +75,7 @@ public class TestPackage implements Serializable {
 		this.testCases = new ArrayList<Testcase>();
 		this.name = name;
 		this.failures = 0;
+		this.counter = 1;
 	}
 	
 	/**

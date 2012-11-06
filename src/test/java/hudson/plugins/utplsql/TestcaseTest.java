@@ -35,14 +35,14 @@ public class TestcaseTest {
 	@Test
 	public void successConstructor()
 	{
-		Testcase testcase = new Testcase("SUCCESS - UT_FAKE.UT_FAKE1: this is just a unittest");
+		Testcase testcase = new Testcase(new TestPackage("test"), "SUCCESS - UT_FAKE.UT_FAKE1: this is just a unittest");
 		assertEquals("Result is wrong", Testcase.SUCCESS, testcase.getResult());
 	}
 
 	@Test
 	public void failureConstructor()
 	{
-		Testcase testcase = new Testcase("FAILURE - UT_FAKE.UT_FAKE1: this is just a unittest");
+		Testcase testcase = new Testcase(new TestPackage("test"), "FAILURE - UT_FAKE.UT_FAKE1: this is just a unittest");
 		assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
 	}
 
@@ -50,7 +50,7 @@ public class TestcaseTest {
 	public void invalidResultConstructor()
 	{
 		@SuppressWarnings("unused")
-		Testcase testcase = new Testcase("something other than SUCCESS or FAILURE as a start");
+		Testcase testcase = new Testcase(new TestPackage("test"), "something other than SUCCESS or FAILURE as a start");
 	}
 	
 	@Test(expected=IndexOutOfBoundsException.class)
@@ -58,7 +58,7 @@ public class TestcaseTest {
 	{
 		//line to parse too short
 		@SuppressWarnings("unused")
-		Testcase testcase = new Testcase("a");		
+		Testcase testcase = new Testcase(new TestPackage("test"), "a");		
 	}
 
 }
