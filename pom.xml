@@ -10,9 +10,22 @@
   <name>Jenkins utPLSQL plugin</name>
   <version>0.5-SNAPSHOT</version>
   <packaging>hpi</packaging>
-  
-  <url>http://wiki.jenkins-ci.org/display/JENKINS/utplsql+Plugin</url>
 
+  <!-- get every artifact through maven.glassfish.org, which proxies all the artifacts that we need -->
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>http://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>http://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <url>http://wiki.jenkins-ci.org/display/JENKINS/utplsql+Plugin</url>
   <developers>
     <developer>
       <id>kusemuckl</id>
