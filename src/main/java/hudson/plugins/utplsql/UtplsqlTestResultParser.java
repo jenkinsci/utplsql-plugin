@@ -149,7 +149,7 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 							.getName()
 							+ "fake-jUnit.xml");
 					fw = new FileWriter(outFile);
-					fw.append(testPackage.getXmlSnippet());
+					fw.append(testPackage.getXmlSnippet(fw.getEncoding()));
 				} finally {
 					IOUtils.closeQuietly(fw);
 				}

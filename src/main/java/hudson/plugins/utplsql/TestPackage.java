@@ -96,9 +96,9 @@ public class TestPackage implements Serializable {
      * The testresults for one Testpackage.
      * @return the xml-code to be inserted into
      */
-		public String getXmlSnippet()
+	public String getXmlSnippet(String encoding)
     {
-        StringBuffer sb = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
+        StringBuffer sb = new StringBuffer("<?xml version=\"1.0\" encoding=\""+encoding+"\" ?>");
         sb.append(System.getProperty("line.separator"));
         sb.append("<testsuite errors=\"0\" failures=\"");
         sb.append(this.failures);

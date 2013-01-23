@@ -109,13 +109,11 @@ public class Testcase implements Serializable
     		if (functionSeparator > 0)
     		{
     			//if the function is really long, the second " may not be in the same line. Then just take the whole line
-    			//we have to replace some characters, since SAX does not like them inside an xml thingy.
-    			this.name = testPackage.getCounter() + line.substring(packageSeparator + 1, functionSeparator).replace("\"", "").replace("<","");
+    			this.name = testPackage.getCounter() + line.substring(packageSeparator + 1, functionSeparator);
     		}	
     		else
     		{
-    			//we have to replace some characters, since SAX does not like them inside an xml thingy.
-    			this.name = testPackage.getCounter() + line.substring(packageSeparator + 1).replace("\"", "").replace("<","");
+    			this.name = testPackage.getCounter() + line.substring(packageSeparator + 1);
     		}    		
     		if (functionSeparator+2 < line.length())
     		{
@@ -144,7 +142,7 @@ public class Testcase implements Serializable
         StringBuffer sb = new StringBuffer("<testcase classname=\"");
         sb.append(this.className);
         sb.append("\" name=\"");
-        sb.append(this.name);
+        sb.append(StringEscapeUtils.escapeXml(this.name));
         sb.append("\" time=\"0\">");
         if (this.result.equals(Testcase.FAILURE))
         {
