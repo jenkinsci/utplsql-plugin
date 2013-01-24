@@ -41,6 +41,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -143,15 +145,15 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 
 			// build fake jUnit-Files from Testcases
 			for (TestPackage testPackage : testPackages) {
-				FileWriter fw = null;
+				OutputStreamWriter out = null;
 				try {
 					File outFile = new File(junitOutputPath, testPackage
 							.getName()
 							+ "fake-jUnit.xml");
-					fw = new FileWriter(outFile);
-					fw.append(testPackage.getXmlSnippet(fw.getEncoding()));
+					out = new OutputStreamWriter(new FileOutputStream(outFile),"UTF-8");
+					out.write(testPackage.getXmlSnippet());
 				} finally {
-					IOUtils.closeQuietly(fw);
+					IOUtils.closeQuietly(out);
 				}
 			}
 
