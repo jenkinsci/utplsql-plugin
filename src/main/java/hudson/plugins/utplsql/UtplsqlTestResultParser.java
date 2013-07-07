@@ -117,16 +117,13 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 							currentLine)) {
 						// new Package starting
 						if (currentPackage != null) {
-							if (currentPackage != null) {
-								testPackages.add(currentPackage);
-							}
+                            testPackages.add(currentPackage);
 						}
 						currentPackage = new TestPackage(currentLine.substring(
 								10, currentLine.length() - 1));
 						currentTestcase = null;
 					} else if (Pattern.matches("^((SUCCESS)|(FAILURE)) - .*",
 							currentLine)) {
-						// TODO: What about multiline stuff?
 						currentTestcase = new Testcase(currentPackage, currentLine);
 						currentPackage.add(currentTestcase);
 					} else if (Pattern.matches("^>.*", currentLine))
@@ -134,8 +131,8 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 						currentTestcase = null;
 					} else if (currentTestcase != null)
 					{
-						//First shot for multiline: If we have a current testcase and the line does not start with ">",
-						//we append the output to the current testcase. Let's see, if that works.
+						//If we have a current testcase and the line does not start with ">",
+						//we append the output to the current testcase.
 						currentTestcase.appendToMessage(currentLine);
 					}
 
