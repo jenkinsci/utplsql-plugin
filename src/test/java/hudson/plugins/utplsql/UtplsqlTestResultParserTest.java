@@ -44,7 +44,7 @@ public class UtplsqlTestResultParserTest extends HudsonTestCase
 		FreeStyleBuild build = project.scheduleBuild2(0).get();
 		assertBuildStatus(Result.UNSTABLE, build);
 		AbstractTestResultAction action = build.getAction(AbstractTestResultAction.class);
-		assertEquals(1, action.getTotalCount());
-		assertEquals(1, action.getFailCount());
+		assertEquals("Number of total Testcases", 3, action.getTotalCount());
+		assertEquals("Number of failed Testcases ", 1, action.getFailCount());
 	}
 }

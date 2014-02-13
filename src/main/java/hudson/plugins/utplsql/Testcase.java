@@ -137,8 +137,7 @@ public class Testcase implements Serializable
         // this is second line ..."
 
         // Parsing line with RexExp - Tested on http://www.debuggex.com/
-        Pattern p = Pattern.compile("(.{1,8}) - (.{0,30})\\.([^\\\" ]{0,30})(?:(?: ?\\[)([\\d\\.,]+)(?: ms\\] ?))? ?:(?: (?:([^\\\" ]{1,30}) \\\")?(.*[^\\\"])(?:\\\"|$))?");
-
+        Pattern p = Pattern.compile("(.{1,8}) - ([^\\.]{0,30})\\.([^\" :]{0,30})(?:(?: ?\\[)([\\d\\.,]+)(?: ms\\] ?))? ?:(?: (?:([^\" ]{1,30}) \")?(.*)(?:$))?");
         // group(O) : All line
         // group(1) : this.result (SUCCESS/FAILURE)
         // group(2) : this.className (Package name : 30 char MAX)
@@ -158,7 +157,7 @@ public class Testcase implements Serializable
         } else {
             setResult(m.group(1));
             this.className = m.group(2);
-            this.name = m.group(3);
+            this.name = testPackage.getCounter() + m.group(3);
             setElapsedTime(m.group(4));
             this.message =  m.group(6);
         }
