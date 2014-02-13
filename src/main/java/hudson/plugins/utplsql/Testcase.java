@@ -37,7 +37,10 @@ import org.apache.commons.lang.StringEscapeUtils;
 public class Testcase implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-    
+
+	// Parsing line with RexExp - Tested on http://www.debuggex.com/
+	private static final Pattern pattern = Pattern.compile("(.{1,8}) - ([^\\.]{0,30})\\.([^\" :]{0,30})(?:(?: ?\\[)([\\d\\.,]+)(?: ms\\] ?))? ?: ?(.*)$");
+	
 	public static final String SUCCESS = "SUCCESS";
 	public static final String FAILURE = "FAILURE";
 	
@@ -85,11 +88,7 @@ public class Testcase implements Serializable
      * @return Message value (surrounded with quotation marks)
      */
     public String getMessage() {
-        StringBuffer sb = new StringBuffer();
-        if(this.message != null) {
-            sb.append("\"").append(this.message).append("\"");
-        }
-        return sb.toString();
+        return message;
     }
 
     /**
@@ -136,16 +135,13 @@ public class Testcase implements Serializable
         // SUCCESS - UT_FAKE.UT_FAKE [0,903 ms] : EQ "Description of testcase very long and multiline
         // this is second line ..."
 
-        // Parsing line with RexExp - Tested on http://www.debuggex.com/
-        Pattern p = Pattern.compile("(.{1,8}) - ([^\\.]{0,30})\\.([^\" :]{0,30})(?:(?: ?\\[)([\\d\\.,]+)(?: ms\\] ?))? ?:(?: (?:([^\" ]{1,30}) \")?(.*)(?:$))?");
         // group(O) : All line
         // group(1) : this.result (SUCCESS/FAILURE)
         // group(2) : this.className (Package name : 30 char MAX)
         // group(3) : this.name (UT Proc : 30 char MAX) (quotation marks and spaces forbidden)
         // group(4) : elapsed time in ms - /!\ : May be null !!!
-        // group(5) : testFunction (EQ, THIS, ... : 30 char MAX) - /!\ : May be null !!!
-        // group(6) : assertion message (should be multiline) and rest of line - /!\ : May be null if message begin on next line !!!
-        Matcher m = p.matcher(line);
+        // group(5) : testFunction (EQ, THIS, ... : 30 char MAX) + assertion message (should be multiline) and rest of line - /!\ : May be null if message begin on next line !!!
+        Matcher m = pattern.matcher(line.trim());
 
         if(!m.matches()){
             // Line doesn't match any expected form. Rather than raising exception, we
@@ -159,17 +155,12 @@ public class Testcase implements Serializable
             this.className = m.group(2);
             this.name = testPackage.getCounter() + m.group(3);
             setElapsedTime(m.group(4));
-            this.message =  m.group(6);
+            this.message =  m.group(5);
         }
     }
         
     public void appendToMessage(String newLine)
     {
-        // Extract possible quotation marks as last char
-        if(newLine.endsWith("\"")){
-            newLine = newLine.substring(0,newLine.length()-1);
-        }
-
         // If message is not yet significant, it's crush
         if(this.message == null || this.message.trim().length()==0) {
             this.message = newLine;

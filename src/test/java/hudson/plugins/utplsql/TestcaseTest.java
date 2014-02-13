@@ -40,7 +40,7 @@ public class TestcaseTest {
         String packageName = "UT_FAKE";
         String procedureName = "UT_FAKE1";
         String message = "this is just a unittest";
-        StringBuffer expectedMessage = new StringBuffer("\"").append(message).append("\"");
+        StringBuffer expectedMessage = new StringBuffer(message);
         StringBuffer line = new StringBuffer(result).append(" - ")
                                     .append(packageName).append(".")
                                     .append(procedureName).append(": ")
@@ -49,7 +49,50 @@ public class TestcaseTest {
         assertEquals("Result is success", result, testcase.getResult());
         assertEquals("Package name is filled", packageName, testcase.getClassName());
         assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Message is filled (and surrounded with quotation marks)", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Message is filled", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
+    }
+
+    @Test
+    public void successConstructorSpecialCharacters()
+    {
+        // SUCCESS - UT_FAKE.UT_FAKE_3: EQ "hint: check regex, for : in first 60 Characters..." Expected "1" and got "1"
+        String result = Testcase.SUCCESS;
+        String packageName = "UT_FAKE";
+        String procedureName = "UT_FAKE_3";
+        String message = "\"hint: check regex, for : in first 60 Characters...\" Expected \"1\" and got \"1\"";
+        StringBuffer expectedMessage = new StringBuffer("EQ ").append(message);
+        StringBuffer line = new StringBuffer(result).append(" - ")
+                                    .append(packageName).append(".")
+                                    .append(procedureName).append(": ")
+                                    .append("EQ ").append(message);
+        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
+        assertEquals("Result is success", result, testcase.getResult());
+        assertEquals("Package name is filled", packageName, testcase.getClassName());
+        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
+        assertEquals("Message is filled", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
+    }
+
+    @Test
+    public void successConstructorIsNull()
+    {
+    	//Test for Jenkins-21657
+        // SUCCESS - UT_FAKE.UT_FAKE_3: ISNULL "test" Expected "" and got ""
+        String result = Testcase.SUCCESS;
+        String packageName = "UT_FAKE";
+        String procedureName = "UT_FAKE_3";
+        String message = "\"test\" Expected \"\" and got \"\"";
+        StringBuffer expectedMessage = new StringBuffer("ISNULL ").append(message);
+        StringBuffer line = new StringBuffer(result).append(" - ")
+                                    .append(packageName).append(".")
+                                    .append(procedureName).append(": ")
+                                    .append("ISNULL ").append(message);
+        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
+        assertEquals("Result is success", result, testcase.getResult());
+        assertEquals("Package name is filled", packageName, testcase.getClassName());
+        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
+        assertEquals("Message is filled", expectedMessage.toString(), testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
@@ -64,7 +107,7 @@ public class TestcaseTest {
         String elapsedTime = "1,101";
         double expectedElapsedTime = 0.001101;
         String message = "this is just a unittest";
-        StringBuffer expectedMessage = new StringBuffer("\"").append(message).append("\"");
+        StringBuffer expectedMessage = new StringBuffer(message);
         StringBuffer line = new StringBuffer(result).append(" - ")
                 .append(packageName).append(".")
                 .append(procedureName).append(" [")
@@ -75,7 +118,7 @@ public class TestcaseTest {
         assertEquals("First pattern - Package name is filled", packageName, testcase.getClassName());
         assertEquals("First pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
         assertEquals("First pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        assertEquals("First pattern - Message is filled (and surrounded with quotation marks)", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("First pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
 
         // SECOND PATTERN : without space after ']'
         // SUCCESS - UT_FAKE.UT_FAKE1 [1,101 ms]: this is just a unittest
@@ -89,7 +132,7 @@ public class TestcaseTest {
         assertEquals("Second pattern - Package name is filled", packageName, testcase.getClassName());
         assertEquals("Second pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
         assertEquals("Second pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        assertEquals("Second pattern - Message is filled (and surrounded with quotation marks)", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Second pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
 
         // THIRD PATTERN : dot in place of comma
         // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: this is just a unittest
@@ -104,7 +147,7 @@ public class TestcaseTest {
         assertEquals("Third pattern - Package name is filled", packageName, testcase.getClassName());
         assertEquals("Third pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
         assertEquals("Third pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        assertEquals("Third pattern - Message is filled (and surrounded with quotation marks)", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Third pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
 
         // FOURTH PATTERN : with test function
         // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: EQ "this is just a unittest"
@@ -113,13 +156,13 @@ public class TestcaseTest {
                 .append(procedureName).append(" [")
                 .append(elapsedTime).append(" ms]: ")
                 .append("EQ \"").append(message).append("\"");
+        expectedMessage = new StringBuffer("EQ \"").append(message).append("\"");
         testcase = new Testcase(new TestPackage("test"), line.toString());
         assertEquals("Fourth pattern - Result is success", result, testcase.getResult());
         assertEquals("Fourth pattern - Package name is filled", packageName, testcase.getClassName());
         assertEquals("Fourth pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
         assertEquals("Fourth pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        //since one " is our only problem right now, we will just ignore it.
-        //assertEquals("Fourth pattern - Message is filled (and surrounded with quotation marks)", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Fourth pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
     }
 
     @Test
@@ -133,7 +176,7 @@ public class TestcaseTest {
 	public void invalidResultConstructor()
 	{
         String unexpectedLine = "something other than SUCCESS or FAILURE as a start";
-        StringBuffer expectedMessage = new StringBuffer("\"").append(unexpectedLine).append("\"");
+        StringBuffer expectedMessage = new StringBuffer(unexpectedLine);
 		Testcase testcase = new Testcase(new TestPackage("test"), unexpectedLine);
         assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
         assertEquals("Unexpected line as message",expectedMessage.toString(), testcase.getMessage());
@@ -144,7 +187,7 @@ public class TestcaseTest {
 	{
         //line to parse too short
         String unexpectedLine = "a";
-        StringBuffer expectedMessage = new StringBuffer("\"").append(unexpectedLine).append("\"");
+        StringBuffer expectedMessage = new StringBuffer(unexpectedLine);
         Testcase testcase = new Testcase(new TestPackage("test"), unexpectedLine);
         assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
         assertEquals("Unexpected line as message",expectedMessage.toString(), testcase.getMessage());
@@ -163,7 +206,7 @@ public class TestcaseTest {
         String firstLine = "\"this is just the first line of message";
         String secondLine = "and this is my second line";
         String lastLine = "and then, this is the last line of this message\"";
-        StringBuffer message = new StringBuffer(firstLine).append(System.getProperty("line.separator"))
+        StringBuffer message = new StringBuffer("EQ ").append(firstLine).append(System.getProperty("line.separator"))
                                .append(secondLine).append(System.getProperty("line.separator"))
                                .append(lastLine);
         StringBuffer line = new StringBuffer(result).append(" - ")
@@ -176,7 +219,7 @@ public class TestcaseTest {
         assertEquals("Result is success", result, testcase.getResult());
         assertEquals("Package name is filled", packageName, testcase.getClassName());
         assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Message is filled (and surrounded with quotation marks)", message.toString(), testcase.getMessage());
+        assertEquals("Message is filled", message.toString(), testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
@@ -190,8 +233,8 @@ public class TestcaseTest {
         String procedureName = "UT_FAKE1";
         String firstLine = "\"this is just the first line of message";
         String secondLine = "and this is my second line";
-        String lastLine = "and then, this is the last line of this message\"";
-        StringBuffer message = new StringBuffer(firstLine).append(System.getProperty("line.separator"))
+        String lastLine = "and then, this is the last line of this message\" Expected \"10\" and got \"10\"";
+        StringBuffer message = new StringBuffer("EQ ").append(firstLine).append(System.getProperty("line.separator"))
                 .append(secondLine).append(System.getProperty("line.separator"))
                 .append(lastLine);
         StringBuffer line = new StringBuffer(result).append(" - ")
@@ -204,7 +247,7 @@ public class TestcaseTest {
         assertEquals("Result is success", result, testcase.getResult());
         assertEquals("Package name is filled", packageName, testcase.getClassName());
         assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Message is filled (and surrounded with quotation marks)", message.toString(), testcase.getMessage());
+        assertEquals("Message is filled", message.toString(), testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
@@ -217,7 +260,7 @@ public class TestcaseTest {
         String packageName = "UT_FAKE";
         String procedureName = "UT_FAKE1";
         String secondLine = "my message is on second line";
-        StringBuffer expectedMessage = new StringBuffer("\"").append(secondLine).append("\"");
+        StringBuffer expectedMessage = new StringBuffer(secondLine);
         StringBuffer line = new StringBuffer(result).append(" - ")
                 .append(packageName).append(".")
                 .append(procedureName).append(":");
