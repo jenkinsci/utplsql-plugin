@@ -119,7 +119,7 @@ public class TestcaseTest {
     }
 
     @Test
-    public void successConstructorWithElapsedTime2() {
+    public void successConstructorWithElapsedTimeWithoutSpaceAfterRightSquareBracket() {
 
         // SECOND PATTERN : without space after ']'
         // SUCCESS - UT_FAKE.UT_FAKE1 [1,101 ms]: this is just a unittest
@@ -144,7 +144,7 @@ public class TestcaseTest {
     }
 
     @Test
-    public void successConstructorWithElapsedTime3() {
+    public void successConstructorWithElapsedTimeWithDotInPlaceOfComma() {
         // THIRD PATTERN : dot in place of comma
         // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: this is just a unittest
         // GIVEN
@@ -165,7 +165,7 @@ public class TestcaseTest {
     }
 
     @Test
-    public void successConstructorWithElapsedTime4() {
+    public void successConstructorWithElapsedTimeWithTestFunction() {
         // FOURTH PATTERN : with test function
         // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: EQ "this is just a unittest"
         //GIVEN
