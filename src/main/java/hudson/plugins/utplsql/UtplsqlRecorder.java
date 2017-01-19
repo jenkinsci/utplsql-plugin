@@ -57,6 +57,11 @@ public class UtplsqlRecorder extends Recorder implements Serializable{
      */
     private final String testResults;
     
+	@DataBoundConstructor
+    public UtplsqlRecorder(String testResults)
+    {
+    	this.testResults = testResults;
+    }
     /**
      * necessary for displaying the current configuration in the Job configuration
      * @return the testResults configuration
@@ -65,12 +70,7 @@ public class UtplsqlRecorder extends Recorder implements Serializable{
 		return testResults;
 	}
 
-	@DataBoundConstructor
-    public UtplsqlRecorder(String testResults)
-    {
-    	this.testResults = testResults;
-    }
-    
+
     // Copied from from HelloWorldBuilder. don't really know what it means, but it seems not to harm. 
     // overrided for better type safety.
     // if your plugin doesn't really define any property on Descriptor,
@@ -133,6 +133,7 @@ public class UtplsqlRecorder extends Recorder implements Serializable{
 	@Extension
     public static class DescriptorImpl extends BuildStepDescriptor<Publisher> {
 
+		@Override
 		public boolean isApplicable(Class<? extends AbstractProject> jobType) {
 			return true;
 		}

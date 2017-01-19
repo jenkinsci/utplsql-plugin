@@ -45,6 +45,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.tools.ant.DirectoryScanner;
@@ -56,144 +57,142 @@ import org.apache.tools.ant.types.FileSet;
  * creates a jUnit testresult.
  */
 public class UtplsqlTestResultParser extends TestResultParser implements
-		Serializable {
+        Serializable {
 
-	/**
-	 * FileCallable, actually doing the work. In the DefaultTestResultParserImpl, 
-	 * which I used as an example first, this Class is created somewhat different,
-	 * which causes problems during Serialization, so that builds on a slave will
-	 * fail. 
-	 */
-	private static final class ParseTestResultCallable implements
-			FileCallable<TestResult> {
-		private String testResultLocations;
+    /**
+     * FileCallable, actually doing the work. In the DefaultTestResultParserImpl,
+     * which I used as an example first, this Class is created somewhat different,
+     * which causes problems during Serialization, so that builds on a slave will
+     * fail.
+     */
+    private static final class ParseTestResultCallable implements
+            FileCallable<TestResult> {
+        private String testResultLocations;
 
-		public ParseTestResultCallable(String testResultLocations) {
-			this.testResultLocations = testResultLocations;
-		}
+        public ParseTestResultCallable(String testResultLocations) {
+            this.testResultLocations = testResultLocations;
+        }
 
-		public TestResult invoke(File dir, VirtualChannel channel)
-				throws IOException, InterruptedException {
+        public TestResult invoke(File dir, VirtualChannel channel)
+                throws IOException, InterruptedException {
 
-			FilePath[] paths = new FilePath(dir).list(testResultLocations);
-			if (paths.length == 0)
-				throw new AbortException("No test reports that matches "
-						+ testResultLocations + " found. Configuration error?");
+            FilePath[] paths = new FilePath(dir).list(testResultLocations);
+            if (paths.length == 0)
+                throw new AbortException("No test reports that matches "
+                        + testResultLocations + " found. Configuration error?");
 
-			// since dir is local, paths all point to the local files
-			List<File> files = new ArrayList<File>(paths.length);
-			for (FilePath path : paths) {
-				File report = new File(path.getRemote());
-				files.add(report);
-			}
+            // since dir is local, paths all point to the local files
+            List<File> files = new ArrayList<File>(paths.length);
+            for (FilePath path : paths) {
+                File report = new File(path.getRemote());
+                files.add(report);
+            }
 
-			return parse(files, dir);
-		}
+            return parse(files, dir);
+        }
 
-		private TestResult parse(List<File> files, File workSpace)
-				throws InterruptedException, IOException {
-			TestResult testResult;
-			final String tmpDirectory = "utPlsql-temporary";
-			ArrayList<TestPackage> testPackages = new ArrayList<TestPackage>();
-			File junitOutputPath = new File(workSpace, tmpDirectory);
-			junitOutputPath.mkdirs();
+        private TestResult parse(List<File> files, File workSpace)
+                throws InterruptedException, IOException {
+            TestResult testResult;
+            final String tmpDirectory = "utPlsql-temporary";
+            ArrayList<TestPackage> testPackages = new ArrayList<TestPackage>();
+            File junitOutputPath = new File(workSpace, tmpDirectory);
+            junitOutputPath.mkdirs();
 
-			for (File file : files) {
-				TestPackage currentPackage = null;
-				Testcase currentTestcase = null;
-				String currentLine;
-				BufferedReader fr = new BufferedReader(new FileReader(file));
-				do {
-					currentLine = fr.readLine();
-					if (currentLine == null) {
-						// either a new package, or the end of the file will add
-						// the package
-						testPackages.add(currentPackage);
-						break;
-					}
-					// For some reason there are a lot of trailing whitespaces.
-					currentLine = currentLine.trim();
-					if (Pattern.matches("^((SUCCESS)|(FAILURE)): \".*\"",
-							currentLine)) {
-						// new Package starting
-						if (currentPackage != null) {
+            for (File file : files) {
+                TestPackage currentPackage = null;
+                Testcase currentTestcase = null;
+                String currentLine;
+                BufferedReader fr = new BufferedReader(new FileReader(file));
+                do {
+                    currentLine = fr.readLine();
+                    if (currentLine == null) {
+                        // either a new package, or the end of the file will add
+                        // the package
+                        testPackages.add(currentPackage);
+                        break;
+                    }
+                    // For some reason there are a lot of trailing whitespaces.
+                    currentLine = currentLine.trim();
+                    Pattern packagePattern = Pattern.compile("^(SUCCESS|FAILURE): \"(?:.*\\.)(.*)\"(?:.)*");
+                    Matcher packageMatcher = packagePattern.matcher(currentLine.trim());
+                    if (packageMatcher.matches()) {
+                        // new Package starting
+                        if (currentPackage != null) {
                             testPackages.add(currentPackage);
-						}
-						currentPackage = new TestPackage(currentLine.substring(
-								10, currentLine.length() - 1));
-						currentTestcase = null;
-					} else if (Pattern.matches("^((SUCCESS)|(FAILURE)) - .*",
-							currentLine)) {
-						currentTestcase = new Testcase(currentPackage, currentLine);
-						currentPackage.add(currentTestcase);
-					} else if (Pattern.matches("^>.*", currentLine))
-					{
-						currentTestcase = null;
-					} else if (currentTestcase != null)
-					{
-						//If we have a current testcase and the line does not start with ">",
-						//we append the output to the current testcase.
-						currentTestcase.appendToMessage(currentLine);
-					}
+                        }
+                        currentPackage = new TestPackage(packageMatcher.group(2));
+                        currentTestcase = null;
+                    } else if (Pattern.matches("^(SUCCESS|FAILURE) - .*",
+                            currentLine)) {
+                        currentTestcase = new Testcase(currentPackage, currentLine);
+                        currentPackage.add(currentTestcase);
+                    } else if (Pattern.matches("^>.*", currentLine)) {
+                        currentTestcase = null;
+                    } else if (currentTestcase != null) {
+                        //If we have a current testcase and the line does not start with ">",
+                        //we append the output to the current testcase.
+                        currentTestcase.appendToMessage(currentLine);
+                    }
 
-				} while (true);
-				IOUtils.closeQuietly(fr);
-			}
+                } while (true);
+                IOUtils.closeQuietly(fr);
+            }
 
-			// build fake jUnit-Files from Testcases
-			for (TestPackage testPackage : testPackages) {
-				OutputStreamWriter out = null;
-				try {
-					File outFile = new File(junitOutputPath, testPackage
-							.getName()
-							+ "fake-jUnit.xml");
-					out = new OutputStreamWriter(new FileOutputStream(outFile),"UTF-8");
-					out.write(testPackage.getXmlSnippet());
-				} finally {
-					IOUtils.closeQuietly(out);
-				}
-			}
+            // build fake jUnit-Files from Testcases
+            for (TestPackage testPackage : testPackages) {
+                OutputStreamWriter out = null;
+                try {
+                    File outFile = new File(junitOutputPath, testPackage
+                            .getName()
+                            + "fake-jUnit.xml");
+                    out = new OutputStreamWriter(new FileOutputStream(outFile), "UTF-8");
+                    out.write(testPackage.getXmlSnippet());
+                } finally {
+                    IOUtils.closeQuietly(out);
+                }
+            }
 
-			FileSet fs = Util.createFileSet(workSpace, tmpDirectory + "/*.xml");
-			DirectoryScanner ds = fs.getDirectoryScanner();
+            FileSet fs = Util.createFileSet(workSpace, tmpDirectory + "/*.xml");
+            DirectoryScanner ds = fs.getDirectoryScanner();
 
-			String[] fileNames = ds.getIncludedFiles();
-			if (fileNames.length == 0) {
-				// no test result. Most likely a configuration error or fatal
-				// problem
-				throw new AbortException(
-						"No test report files were found. Configuration error?");
-			}
-			
-			//create the jUnit result from our fake files. 
-			testResult = new TestResult(0, ds, false);
+            String[] fileNames = ds.getIncludedFiles();
+            if (fileNames.length == 0) {
+                // no test result. Most likely a configuration error or fatal
+                // problem
+                throw new AbortException(
+                        "No test report files were found. Configuration error?");
+            }
 
-			return testResult;
-		}
+            //create the jUnit result from our fake files.
+            testResult = new TestResult(0, ds, false);
 
-	}
+            return testResult;
+        }
 
-	private static final long serialVersionUID = 1L;
+    }
 
-	@Override
-	public String getDisplayName() {
-		return "ut/plsql parser";
-	}
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public String getTestResultLocationMessage() {
-		return "Paths to dbms_output files of ut/plsql:";
-	}
+    @Override
+    public String getDisplayName() {
+        return "ut/plsql parser";
+    }
 
-	/**
-	 * Called by the Recorder.
-	 */
-	@Override
-	public TestResult parse(String testResultLocations, AbstractBuild build,
-			Launcher launcher, TaskListener listener)
-			throws InterruptedException, IOException {
-		TestResult testResult = build.getWorkspace().act(
-				new ParseTestResultCallable(testResultLocations));
-		return testResult;
-	}
+    @Override
+    public String getTestResultLocationMessage() {
+        return "Paths to dbms_output files of ut/plsql:";
+    }
+
+    /**
+     * Called by the Recorder.
+     */
+    @Override
+    public TestResult parse(String testResultLocations, AbstractBuild build,
+                            Launcher launcher, TaskListener listener)
+            throws InterruptedException, IOException {
+        TestResult testResult = build.getWorkspace().act(
+                new ParseTestResultCallable(testResultLocations));
+        return testResult;
+    }
 }
