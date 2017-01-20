@@ -114,7 +114,7 @@ public class UtplsqlTestResultParser extends TestResultParser implements
                     }
                     // For some reason there are a lot of trailing whitespaces.
                     currentLine = currentLine.trim();
-                    Pattern packagePattern = Pattern.compile("^(SUCCESS|FAILURE): \"(?:.*\\.)(.*)\"(?:.)*");
+                    Pattern packagePattern = Pattern.compile("^(SUCCESS|FAILURE): \"(?:.*\\.)?(.*)\"(?:.)*");
                     Matcher packageMatcher = packagePattern.matcher(currentLine.trim());
                     if (packageMatcher.matches()) {
                         // new Package starting

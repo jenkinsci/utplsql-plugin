@@ -39,8 +39,7 @@ public class Testcase implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	// Parsing line with RexExp - Tested on http://www.debuggex.com/
-	private static final Pattern pattern
-            = Pattern.compile("^(.{1,7})\\s-\\s(UT_[^\\.\\s]{0,27})\\.{1}([^:\\[\\s]{0,30})\\s?(\\[\\d+[,|.]\\d+\\sms\\])?\\s?:\\s?([^>]*)$");
+	private static final Pattern pattern = Pattern.compile("(.{1,8}) - ([^\\.]{0,30})\\.([^\" :]{0,30})(?:(?: ?\\[)([\\d\\.,]+)(?: ms\\] ?))? ?: ?(.*)$");
 	
 	public static final String SUCCESS = "SUCCESS";
 	public static final String FAILURE = "FAILURE";
@@ -106,8 +105,12 @@ public class Testcase implements Serializable
     }
 
     public double getElapsedTimeInSeconds() {
+        double valueInMilliSeconds = 0.0;
 
-        return 0.0d;
+        if(this.elapsedTime != null) {
+            valueInMilliSeconds = Double.valueOf(this.elapsedTime.replace(',', '.'))/1000;
+        }
+        return valueInMilliSeconds;
     }
     
     /**
@@ -139,6 +142,7 @@ public class Testcase implements Serializable
         // group(4) : elapsed time in ms - /!\ : May be null !!!
         // group(5) : testFunction (EQ, THIS, ... : 30 char MAX) + assertion message (should be multiline) and rest of line - /!\ : May be null if message begin on next line !!!
         Matcher m = pattern.matcher(line.trim());
+
         if(!m.matches()){
             // Line doesn't match any expected form. Rather than raising exception, we
             // log unexpected line as failure test

@@ -1,44 +1,27 @@
-Ran setup
-Ran teardown
-.
->    SSSS   U	  U  III  TTTTTTT EEEEEEE     FFFFFFF	AA     III  L	   U	 U RRRRR   EEEEEEE
->   S	 S  U	  U   I      T	  E	      F        A  A	I   L	   U	 U R	R  E
->  S	    U	  U   I      T	  E	      F       A    A	I   L	   U	 U R	 R E
->   S	    U	  U   I      T	  E	      F      A	    A	I   L	   U	 U R	 R E
->    SSSS   U	  U   I      T	  EEEE	      FFFF   A	    A	I   L	   U	 U RRRRRR  EEEE
->	 S  U	  U   I      T	  E	      F      AAAAAAAA	I   L	   U	 U R   R   E
->	  S U	  U   I      T	  E	      F      A	    A	I   L	   U	 U R	R  E
->   S	 S   U	 U    I      T	  E	      F      A	    A	I   L	    U	U  R	 R E
->    SSSS     UUU    III     T	  EEEEEEE     F      A	    A  III  LLLLLLL  UUU   R	 R EEEEEEE
-.
-SUITE FAILURE: "ALL"
-SUITE STATS: 0 of 1 packages succeeded.
-SUITE STATS: 2 of 3 individual test cases succeeded.
-.
-.
->  FFFFFFF   AA     III  L	U     U RRRRR	EEEEEEE
->  F	    A  A     I	 L	U     U R    R	E
->  F	   A	A    I	 L	U     U R     R E
->  F	  A	 A   I	 L	U     U R     R E
->  FFFF   A	 A   I	 L	U     U RRRRRR	EEEE
->  F	  AAAAAAAA   I	 L	U     U R   R	E
->  F	  A	 A   I	 L	U     U R    R	E
->  F	  A	 A   I	 L	 U   U	R     R E
->  F	  A	 A  III  LLLLLLL  UUU	R     R EEEEEEE
-.
-FAILURE: "USER1.UT_BETWNSTR" Run ID: 106
-.
-> Individual Test Case Results:
+.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+>  FFFFFFF   AA     III  L      U     U RRRRR   EEEEEEE                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+>  F        A  A     I   L      U     U R    R  E                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+>  F       A    A    I   L      U     U R     R E                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+>  F      A      A   I   L      U     U R     R E                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+>  FFFF   A      A   I   L      U     U RRRRRR  EEEE                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+>  F      AAAAAAAA   I   L      U     U R   R   E                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+>  F      A      A   I   L      U     U R    R  E                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+>  F      A      A   I   L       U   U  R     R E                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+>  F      A      A  III  LLLLLLL  UUU   R     R EEEEEEE                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+FAILURE: "UT_FAKE"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+> Individual Test Case Results:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+FAILURE - UT_FAKE.UT_FAKE: EQQUERYVALUE "Description of testcase" Result: Query "select count(*) from whatever" returned value "1" that does  not match "0"                                                                                                                                                                                                                                                                                                                       
 >
-SUCCESS - UT_BETWNSTR.UT_BETWNSTR_NULL_END: ISNULL "null end" Expected "" and got ""
->
-SUCCESS - UT_BETWNSTR.UT_BETWNSTR_NULL_START: ISNULL "null start" Expected "" and got ""
->
-FAILURE - UT_BETWNSTR.UT_BETWNSTR_OK: EQ "normal" Expected "cdefgh" and got "cde"
->
->
-> Errors recorded in utPLSQL Error Log:
->
-> NONE FOUND
+SUCCESS - UT_FAKE.UT_FAKE_2: ISNULL "Description of testcase #1 - containing special characters" Expected "" and got ""	
+>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+SUCCESS - UT_FAKE.UT_FAKE_3: EQ "hint: check regex, for : in first 60 Characters..." Expected "1" and got "1"
+>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+> Errors recorded in utPLSQL Error Log:                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
+> NONE FOUND                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
 
 PL/SQL procedure successfully completed.
+

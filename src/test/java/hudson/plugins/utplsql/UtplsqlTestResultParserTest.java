@@ -22,9 +22,36 @@ public class UtplsqlTestResultParserTest extends HudsonTestCase
 	{
 		final InputStream input = this.getClass().getResourceAsStream("OneFileOnePackage.log");
 		FreeStyleProject project = createFreeStyleProject();
+
+		addTestBuilderToProject(input, project);
+		UtplsqlRecorder recorder = new UtplsqlRecorder("*.txt");
+		project.getPublishersList().add(recorder);
+		FreeStyleBuild build = project.scheduleBuild2(0).get();
+		assertBuildStatus(Result.UNSTABLE, build);
+		AbstractTestResultAction action = build.getAction(AbstractTestResultAction.class);
+		assertEquals("Number of total Testcases", 3, action.getTotalCount());
+		assertEquals("Number of failed Testcases ", 1, action.getFailCount());
+	}
+
+
+	public void testOneFileOneSuiteOnePackage() throws Exception
+	{
+		final InputStream input = this.getClass().getResourceAsStream("OneFileOneTestSuiteOnePackage.log");
+		FreeStyleProject project = createFreeStyleProject();
+		addTestBuilderToProject(input, project);
+		UtplsqlRecorder recorder = new UtplsqlRecorder("*.txt");
+		project.getPublishersList().add(recorder);
+		FreeStyleBuild build = project.scheduleBuild2(0).get();
+		assertBuildStatus(Result.UNSTABLE, build);
+		AbstractTestResultAction action = build.getAction(AbstractTestResultAction.class);
+		assertEquals("Number of total Testcases", 3, action.getTotalCount());
+		assertEquals("Number of failed Testcases ", 1, action.getFailCount());
+	}
+
+	private void addTestBuilderToProject(final InputStream input, FreeStyleProject project) throws IOException {
 		project.getBuildersList().add(new TestBuilder() {
 		    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
-		        BuildListener listener) throws InterruptedException, IOException {
+								   BuildListener listener) throws InterruptedException, IOException {
 		        OutputStream output = build.getWorkspace().child("result.txt").write();
 		        int b;
 		        do
@@ -39,12 +66,5 @@ public class UtplsqlTestResultParserTest extends HudsonTestCase
 		        return true;
 		    }
 		});
-		UtplsqlRecorder recorder = new UtplsqlRecorder("*.txt");
-		project.getPublishersList().add(recorder);
-		FreeStyleBuild build = project.scheduleBuild2(0).get();
-		assertBuildStatus(Result.UNSTABLE, build);
-		AbstractTestResultAction action = build.getAction(AbstractTestResultAction.class);
-		assertEquals("Number of total Testcases", 3, action.getTotalCount());
-		assertEquals("Number of failed Testcases ", 1, action.getFailCount());
 	}
 }
