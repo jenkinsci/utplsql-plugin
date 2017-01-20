@@ -140,7 +140,7 @@ public class UtplsqlRecorder extends Recorder implements Serializable{
 
 		@Override
 		public String getDisplayName() {
-			return "Publish utPLSQL test result report";
+			return Messages.UtplsqlRecorder_DisplayName();
 		}
     	
     }
