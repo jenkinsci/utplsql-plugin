@@ -14,11 +14,11 @@
  * all copies or substantial portions of the Software.
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
 package hudson.plugins.utplsql;
@@ -32,244 +32,280 @@ import org.junit.Test;
  */
 public class TestcaseTest {
 
+    private final String packageName = "UT_FAKE";
+    private final double expectedElapsedTime = 0.001101;
+    private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
     @Test
-    public void successConstructor()
-    {
+    public void successConstructor() {
         // SUCCESS - UT_FAKE.UT_FAKE1: this is just a unittest
-        String result = Testcase.SUCCESS;
-        String packageName = "UT_FAKE";
-        String procedureName = "UT_FAKE1";
-        String message = "this is just a unittest";
-        StringBuffer expectedMessage = new StringBuffer(message);
-        StringBuffer line = new StringBuffer(result).append(" - ")
-                                    .append(packageName).append(".")
-                                    .append(procedureName).append(": ")
-                                    .append(message);
-        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
-        assertEquals("Result is success", result, testcase.getResult());
+
+        // GIVEN
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1: this is just a unittest";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
+
+        // THEN
+        final String procedureName = "1UT_FAKE1";
+        final String expectedMessage = "this is just a unittest";
+        assertEquals("Result is success", Testcase.SUCCESS, testcase.getResult());
         assertEquals("Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Message is filled", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("Message is filled", expectedMessage, testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
     @Test
-    public void successConstructorSpecialCharacters()
-    {
+    public void successConstructorSpecialCharacters() {
         // SUCCESS - UT_FAKE.UT_FAKE_3: EQ "hint: check regex, for : in first 60 Characters..." Expected "1" and got "1"
-        String result = Testcase.SUCCESS;
-        String packageName = "UT_FAKE";
-        String procedureName = "UT_FAKE_3";
-        String message = "\"hint: check regex, for : in first 60 Characters...\" Expected \"1\" and got \"1\"";
-        StringBuffer expectedMessage = new StringBuffer("EQ ").append(message);
-        StringBuffer line = new StringBuffer(result).append(" - ")
-                                    .append(packageName).append(".")
-                                    .append(procedureName).append(": ")
-                                    .append("EQ ").append(message);
+
+        // GIVEN
+        StringBuffer line = new StringBuffer("SUCCESS - UT_FAKE.UT_FAKE_3: EQ \"hint: check regex, for : in first 60 Characters...\" Expected \"1\" and got \"1\"");
+
+        // WHEN
         Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
-        assertEquals("Result is success", result, testcase.getResult());
+
+        // THEN
+        String procedureName = "1UT_FAKE_3";
+        String expectedMessage = "EQ \"hint: check regex, for : in first 60 Characters...\" Expected \"1\" and got \"1\"";
+        assertEquals("Result is success", Testcase.SUCCESS, testcase.getResult());
+
         assertEquals("Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Message is filled", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("Message is filled", expectedMessage, testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
     @Test
-    public void successConstructorIsNull()
-    {
-    	//Test for Jenkins-21657
+    public void successConstructorIsNull() {
+        // Test for Jenkins-21657
         // SUCCESS - UT_FAKE.UT_FAKE_3: ISNULL "test" Expected "" and got ""
-        String result = Testcase.SUCCESS;
-        String packageName = "UT_FAKE";
-        String procedureName = "UT_FAKE_3";
-        String message = "\"test\" Expected \"\" and got \"\"";
-        StringBuffer expectedMessage = new StringBuffer("ISNULL ").append(message);
-        StringBuffer line = new StringBuffer(result).append(" - ")
-                                    .append(packageName).append(".")
-                                    .append(procedureName).append(": ")
-                                    .append("ISNULL ").append(message);
-        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
-        assertEquals("Result is success", result, testcase.getResult());
+
+        // GIVEN
+        String line = "SUCCESS - UT_FAKE.UT_FAKE_3: ISNULL \"test\" Expected \"\" and got \"\"";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
+
+        // THEN
+        String procedureName = "1UT_FAKE_3";
+        String expectedMessage = "ISNULL \"test\" Expected \"\" and got \"\"";
+        assertEquals("Result is success", Testcase.SUCCESS, testcase.getResult());
         assertEquals("Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Message is filled", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("Message is filled", expectedMessage, testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
     @Test
-    public void successConstructorWithElapsedTime()
-    {
+    public void successConstructorWithElapsedTime() {
         // FIRST PATTERN :
         // SUCCESS - UT_FAKE.UT_FAKE1 [1,101 ms] : this is just a unittest
-        String result = Testcase.SUCCESS;
-        String packageName = "UT_FAKE";
-        String procedureName = "UT_FAKE1";
-        String elapsedTime = "1,101";
-        double expectedElapsedTime = 0.001101;
-        String message = "this is just a unittest";
-        StringBuffer expectedMessage = new StringBuffer(message);
-        StringBuffer line = new StringBuffer(result).append(" - ")
-                .append(packageName).append(".")
-                .append(procedureName).append(" [")
-                .append(elapsedTime).append(" ms] : ")
-                .append(message);
-        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
-        assertEquals("First pattern - Result is success", result, testcase.getResult());
-        assertEquals("First pattern - Package name is filled", packageName, testcase.getClassName());
-        assertEquals("First pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("First pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        assertEquals("First pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
 
-        // SECOND PATTERN : without space after ']'
-        // SUCCESS - UT_FAKE.UT_FAKE1 [1,101 ms]: this is just a unittest
-        line = new StringBuffer(result).append(" - ")
-                .append(packageName).append(".")
-                .append(procedureName).append(" [")
-                .append(elapsedTime).append(" ms]: ")
-                .append(message);
-        testcase = new Testcase(new TestPackage("test"), line.toString());
-        assertEquals("Second pattern - Result is success", result, testcase.getResult());
-        assertEquals("Second pattern - Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Second pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Second pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        assertEquals("Second pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
+        // GIVEN
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1 [1,101 ms] : this is just a unittest";
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
 
-        // THIRD PATTERN : dot in place of comma
-        // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: this is just a unittest
-        elapsedTime = "1.101";
-        line = new StringBuffer(result).append(" - ")
-                .append(packageName).append(".")
-                .append(procedureName).append(" [")
-                .append(elapsedTime).append(" ms]: ")
-                .append(message);
-        testcase = new Testcase(new TestPackage("test"), line.toString());
-        assertEquals("Third pattern - Result is success", result, testcase.getResult());
-        assertEquals("Third pattern - Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Third pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Third pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        assertEquals("Third pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
-
-        // FOURTH PATTERN : with test function
-        // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: EQ "this is just a unittest"
-        line = new StringBuffer(result).append(" - ")
-                .append(packageName).append(".")
-                .append(procedureName).append(" [")
-                .append(elapsedTime).append(" ms]: ")
-                .append("EQ \"").append(message).append("\"");
-        expectedMessage = new StringBuffer("EQ \"").append(message).append("\"");
-        testcase = new Testcase(new TestPackage("test"), line.toString());
-        assertEquals("Fourth pattern - Result is success", result, testcase.getResult());
-        assertEquals("Fourth pattern - Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Fourth pattern - Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Fourth pattern - Elapsed time is filled", expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
-        assertEquals("Fourth pattern - Message is filled", expectedMessage.toString(), testcase.getMessage());
+        // THEN
+        String procedureName = "1UT_FAKE1";
+        String expectedMessage = "this is just a unittest";
+        assertEquals("First pattern - Result is success", Testcase.SUCCESS, testcase.getResult());
+        assertEquals("First pattern - Package name is filled", this.packageName, testcase.getClassName());
+        assertEquals("First pattern - Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("First pattern - Elapsed time is filled", this.expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
+        assertEquals("First pattern - Message is filled", expectedMessage, testcase.getMessage());
     }
 
     @Test
-	public void failureConstructor()
-	{
-		Testcase testcase = new Testcase(new TestPackage("test"), "FAILURE - UT_FAKE.UT_FAKE1: this is just a unittest");
-		assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
-	}
+    public void successConstructorWithElapsedTimeWithoutSpaceAfterRightSquareBracket() {
+        // SECOND PATTERN : without space after ']'
+        // SUCCESS - UT_FAKE.UT_FAKE1 [1,101 ms]: this is just a unittest
 
-	@Test
-	public void invalidResultConstructor()
-	{
-        String unexpectedLine = "something other than SUCCESS or FAILURE as a start";
-        StringBuffer expectedMessage = new StringBuffer(unexpectedLine);
-		Testcase testcase = new Testcase(new TestPackage("test"), unexpectedLine);
-        assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
-        assertEquals("Unexpected line as message",expectedMessage.toString(), testcase.getMessage());
-	}
-	
-	@Test
-    public void invalidLineContructor()
-	{
-        //line to parse too short
-        String unexpectedLine = "a";
-        StringBuffer expectedMessage = new StringBuffer(unexpectedLine);
-        Testcase testcase = new Testcase(new TestPackage("test"), unexpectedLine);
-        assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
-        assertEquals("Unexpected line as message",expectedMessage.toString(), testcase.getMessage());
+        // GIVEN
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1 [1,101 ms]: this is just a unittest";
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
 
-	}
+        // THEN
+        String procedureName = "1UT_FAKE1";
+        String expectedMessage = "this is just a unittest";
+        assertEquals("First pattern - Result is success", Testcase.SUCCESS, testcase.getResult());
+        assertEquals("First pattern - Package name is filled", this.packageName, testcase.getClassName());
+        assertEquals("First pattern - Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("First pattern - Elapsed time is filled", this.expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
+        assertEquals("First pattern - Message is filled", expectedMessage, testcase.getMessage());
+    }
 
     @Test
-    public void multiLineMessage()
-    {
+    public void successConstructorWithElapsedTimeWithDotInPlaceOfComma() {
+        // THIRD PATTERN : dot in place of comma
+        // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: this is just a unittest
+
+        // GIVEN
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: this is just a unittest";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
+
+        // THEN
+        String procedureName = "1UT_FAKE1";
+        String expectedMessage = "this is just a unittest";
+        assertEquals("Third pattern - Result is success", Testcase.SUCCESS, testcase.getResult());
+        assertEquals("Third pattern - Package name is filled", this.packageName, testcase.getClassName());
+        assertEquals("Third pattern - Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("Third pattern - Elapsed time is filled", this.expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
+        assertEquals("Third pattern - Message is filled", expectedMessage, testcase.getMessage());
+    }
+
+    @Test
+    public void successConstructorWithElapsedTimeWithTestFunction() {
+        // FOURTH PATTERN : with test function
+        // SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: EQ "this is just a unittest"
+
+        //GIVEN
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1 [1.101 ms]: EQ \"this is just a unittest\"";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
+
+        // THEN
+        String procedureName = "1UT_FAKE1";
+        String expectedMessage = "EQ \"this is just a unittest\"";
+
+        assertEquals("Fourth pattern - Result is success", Testcase.SUCCESS, testcase.getResult());
+        assertEquals("Fourth pattern - Package name is filled", this.packageName, testcase.getClassName());
+        assertEquals("Fourth pattern - Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("Fourth pattern - Elapsed time is filled", this.expectedElapsedTime, testcase.getElapsedTimeInSeconds(), 0.0);
+        assertEquals("Fourth pattern - Message is filled", expectedMessage, testcase.getMessage());
+    }
+
+    @Test
+    public void failureConstructor() {
+        // GIVEN
+        String line = "FAILURE - UT_FAKE.UT_FAKE1: this is just a unittest";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
+
+        //THEN
+        assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
+    }
+
+    @Test
+    public void invalidResultConstructor() {
+        // GIVEN
+        String unexpectedLine = "something other than SUCCESS or FAILURE as a start";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), unexpectedLine);
+
+        // THEN
+        assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
+        assertEquals("Unexpected line as message", unexpectedLine, testcase.getMessage());
+    }
+
+    @Test
+    public void invalidLineConstructorWithLineTooShortToParse() {
+        // Line to parse too short
+        // GIVEN
+        String unexpectedLine = "a";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), unexpectedLine);
+
+        // THEN
+        assertEquals("Result is wrong", Testcase.FAILURE, testcase.getResult());
+        assertEquals("Unexpected line as message", unexpectedLine, testcase.getMessage());
+
+    }
+
+    @Test
+    public void successConstructorWithMultiLineMessage() {
         // SUCCESS - UT_FAKE.UT_FAKE1: EQ "this is just the first line of message
         // and this is my second line
         // and then, this is the last line of this message"
-        String result = Testcase.SUCCESS;
-        String packageName = "UT_FAKE";
-        String procedureName = "UT_FAKE1";
+
+        // GIVEN
         String firstLine = "\"this is just the first line of message";
         String secondLine = "and this is my second line";
         String lastLine = "and then, this is the last line of this message\"";
-        StringBuffer message = new StringBuffer("EQ ").append(firstLine).append(System.getProperty("line.separator"))
-                               .append(secondLine).append(System.getProperty("line.separator"))
-                               .append(lastLine);
-        StringBuffer line = new StringBuffer(result).append(" - ")
-                .append(packageName).append(".")
-                .append(procedureName).append(": EQ ")
-                .append(firstLine);
-        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
+
+        StringBuffer message = new StringBuffer("EQ ")
+                                    .append(firstLine)
+                                    .append(LINE_SEPARATOR)
+                                    .append(secondLine)
+                                    .append(LINE_SEPARATOR)
+                                    .append(lastLine);
+
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1: EQ \"this is just the first line of message";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
         testcase.appendToMessage(secondLine);
         testcase.appendToMessage(lastLine);
-        assertEquals("Result is success", result, testcase.getResult());
-        assertEquals("Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
+
+        // THEN
+        String procedureName = "1UT_FAKE1";
+        assertEquals("Result is success", Testcase.SUCCESS, testcase.getResult());
+        assertEquals("Package name is filled", this.packageName, testcase.getClassName());
+        assertEquals("Procedure name is filled", procedureName, testcase.getName());
         assertEquals("Message is filled", message.toString(), testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
     @Test
-    public void multiLineMessageWithExpected()
-    {
+    public void successConstructorWithMultiLineMessageWithExpected() {
         // SUCCESS - UT_FAKE.UT_FAKE1: EQ "this is just the first line of message
         // and then, this is the last line of this message" Expected "10" and got "10"
-        String result = Testcase.SUCCESS;
-        String packageName = "UT_FAKE";
-        String procedureName = "UT_FAKE1";
+
+        // GIVEN
         String firstLine = "\"this is just the first line of message";
         String secondLine = "and this is my second line";
         String lastLine = "and then, this is the last line of this message\" Expected \"10\" and got \"10\"";
-        StringBuffer message = new StringBuffer("EQ ").append(firstLine).append(System.getProperty("line.separator"))
-                .append(secondLine).append(System.getProperty("line.separator"))
-                .append(lastLine);
-        StringBuffer line = new StringBuffer(result).append(" - ")
-                .append(packageName).append(".")
-                .append(procedureName).append(": EQ ")
-                .append(firstLine);
-        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
+        StringBuffer message = new StringBuffer("EQ ")
+                                    .append(firstLine)
+                                    .append(LINE_SEPARATOR)
+                                    .append(secondLine)
+                                    .append(LINE_SEPARATOR)
+                                    .append(lastLine);
+
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1: EQ \"this is just the first line of message";
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
         testcase.appendToMessage(secondLine);
         testcase.appendToMessage(lastLine);
-        assertEquals("Result is success", result, testcase.getResult());
+
+        // THEN
+        String procedureName = "1UT_FAKE1";
+        assertEquals("Result is success", Testcase.SUCCESS, testcase.getResult());
         assertEquals("Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
+        assertEquals("Procedure name is filled", procedureName, testcase.getName());
         assertEquals("Message is filled", message.toString(), testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 
     @Test
-    public void messageOnlyOnSecondLine()
-    {
+    public void successConstructorWithMessageOnlyOnSecondLine() {
         // SUCCESS - UT_FAKE.UT_FAKE1:
         // my message is on second line
-        String result = Testcase.SUCCESS;
-        String packageName = "UT_FAKE";
-        String procedureName = "UT_FAKE1";
+
+        // GIVEN
+        String line = "SUCCESS - UT_FAKE.UT_FAKE1:";
         String secondLine = "my message is on second line";
-        StringBuffer expectedMessage = new StringBuffer(secondLine);
-        StringBuffer line = new StringBuffer(result).append(" - ")
-                .append(packageName).append(".")
-                .append(procedureName).append(":");
-        Testcase testcase = new Testcase(new TestPackage("test"), line.toString());
+
+        // WHEN
+        Testcase testcase = new Testcase(new TestPackage("test"), line);
         testcase.appendToMessage(secondLine);
-        assertEquals("Result is success", result, testcase.getResult());
+
+        // THEN
+        String procedureName = "1UT_FAKE1";
+        assertEquals("Result is success", Testcase.SUCCESS, testcase.getResult());
         assertEquals("Package name is filled", packageName, testcase.getClassName());
-        assertEquals("Procedure name is filled", "1" + procedureName, testcase.getName());
-        assertEquals("Message is filled (and surrounded with quotation marks)", expectedMessage.toString(), testcase.getMessage());
+        assertEquals("Procedure name is filled", procedureName, testcase.getName());
+        assertEquals("Message is filled (and surrounded with quotation marks)", secondLine, testcase.getMessage());
         assertEquals("Elapsed time is forced to 0", 0.0, testcase.getElapsedTimeInSeconds(), 0.0);
     }
 }
