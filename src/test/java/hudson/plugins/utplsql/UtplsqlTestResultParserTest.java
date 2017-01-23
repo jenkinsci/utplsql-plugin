@@ -47,4 +47,36 @@ public class UtplsqlTestResultParserTest extends HudsonTestCase
 		assertEquals("Number of total Testcases", 3, action.getTotalCount());
 		assertEquals("Number of failed Testcases ", 1, action.getFailCount());
 	}
+
+	
+	public void testTestSuite() throws Exception
+	{
+		final InputStream input = this.getClass().getResourceAsStream("TestSuite.log");
+		FreeStyleProject project = createFreeStyleProject();
+		project.getBuildersList().add(new TestBuilder() {
+		    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher,
+		        BuildListener listener) throws InterruptedException, IOException {
+		        OutputStream output = build.getWorkspace().child("result.txt").write();
+		        int b;
+		        do
+		        {
+		        	b = input.read();
+		        	if (b == -1)
+		        	{
+		        		break;
+		        	}
+		        	output.write(b);
+		        } while (true);
+		        return true;
+		    }
+		});
+		UtplsqlRecorder recorder = new UtplsqlRecorder("*.txt");
+		project.getPublishersList().add(recorder);
+		FreeStyleBuild build = project.scheduleBuild2(0).get();
+		assertBuildStatus(Result.SUCCESS, build);
+		AbstractTestResultAction action = build.getAction(AbstractTestResultAction.class);
+		assertEquals("Number of total Testcases", 8, action.getTotalCount());
+		assertEquals("Number of failed Testcases ", 0, action.getFailCount());
+	}
+
 }

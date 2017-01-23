@@ -113,14 +113,16 @@ public class UtplsqlTestResultParser extends TestResultParser implements
 					}
 					// For some reason there are a lot of trailing whitespaces.
 					currentLine = currentLine.trim();
-					if (Pattern.matches("^((SUCCESS)|(FAILURE)): \".*\"",
+					if (Pattern.matches("^ ?((SUCCESS)|(FAILURE)): \".*\".*",
 							currentLine)) {
 						// new Package starting
 						if (currentPackage != null) {
                             testPackages.add(currentPackage);
 						}
+						int start = currentLine.indexOf("\"") + 1;
+						int end = currentLine.lastIndexOf("\"") - 1;
 						currentPackage = new TestPackage(currentLine.substring(
-								10, currentLine.length() - 1));
+								start, end));
 						currentTestcase = null;
 					} else if (Pattern.matches("^((SUCCESS)|(FAILURE)) - .*",
 							currentLine)) {
